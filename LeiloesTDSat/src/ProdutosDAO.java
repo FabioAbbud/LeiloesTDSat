@@ -63,8 +63,44 @@ public class ProdutosDAO {
     }
     
     public ArrayList<ProdutosDTO> listarProdutos(){
+ArrayList<ProdutosDTO> listagem = new ArrayList<>();
+    Connection conn = null;
+    PreparedStatement pstm = null;
+    ResultSet rs = null;
+
+    try {
+    
+        conn = new conectaDAO().connectDB();
+
         
-        return listagem;
+        String sql = "SELECT id, nome, valor, status FROM produtos";
+        pstm = conn.prepareStatement(sql);
+        rs = pstm.executeQuery();
+
+      
+        while (rs.next()) {
+            ProdutosDTO produto = new ProdutosDTO();
+            produto.setId(rs.getInt("id"));
+            produto.setNome(rs.getString("nome"));
+            produto.setValor(rs.getInt("valor"));
+            produto.setStatus(rs.getString("status"));
+
+            listagem.add(produto);
+        }
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, "Erro ao listar produtos: " + e.getMessage());
+    } finally {
+        
+        try {
+            if (rs != null) rs.close();
+            if (pstm != null) pstm.close();
+            if (conn != null) conn.close();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao fechar conexão: " + e.getMessage());
+        }
+    }
+
+    return listagem;
     }
     
     
