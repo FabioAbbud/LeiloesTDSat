@@ -103,8 +103,82 @@ ArrayList<ProdutosDTO> listagem = new ArrayList<>();
     return listagem;
     }
     
-    
-    
+    public void venderProduto(int idProduto) {
+    Connection conn = null;
+    PreparedStatement pstm = null;
+
+    try {
+        // Conexão com o banco
+        conn = new conectaDAO().connectDB();
+
+        // Atualizando o status do produto para "Vendido"
+        String sql = "UPDATE produtos SET status = ? WHERE id = ?";
+        pstm = conn.prepareStatement(sql);
+        pstm.setString(1, "Vendido");
+        pstm.setInt(2, idProduto);
+
+        int rowsAffected = pstm.executeUpdate();
+
+        // Verifica se o produto foi atualizado
+        if (rowsAffected > 0) {
+            JOptionPane.showMessageDialog(null, "Produto vendido com sucesso!");
+        } else {
+            JOptionPane.showMessageDialog(null, "Produto não encontrado ou já vendido.");
+        }
+
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, "Erro ao vender produto: " + e.getMessage());
+    } finally {
+        // Fechando recursos
+        try {
+            if (pstm != null) pstm.close();
+            if (conn != null) conn.close();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao fechar conexão: " + e.getMessage());
+        }
+    }
+}
+    public ArrayList<ProdutosDTO> listarProdutosVendidos() {
+    ArrayList<ProdutosDTO> produtosVendidos = new ArrayList<>();
+    Connection conn = null;
+    PreparedStatement pstm = null;
+    ResultSet rs = null;
+
+    try {
+        // Estabelecendo a conexão com o banco de dados
+        conn = new conectaDAO().connectDB();
+
+        // SQL para buscar os produtos com status 'Vendido'
+        String sql = "SELECT * FROM produtos WHERE status = ?";
+        pstm = conn.prepareStatement(sql);
+        pstm.setString(1, "Vendido");
+
+        // Executar a consulta
+        rs = pstm.executeQuery();
+
+        // Preencher a lista com os produtos vendidos
+        while (rs.next()) {
+            ProdutosDTO produto = new ProdutosDTO();
+            produto.setId(rs.getInt("id"));
+            produto.setNome(rs.getString("nome"));
+            produto.setValor(rs.getInt("valor"));
+            produto.setStatus(rs.getString("status"));
+            produtosVendidos.add(produto);
+        }
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, "Erro ao listar produtos vendidos: " + e.getMessage());
+    } finally {
+        // Fechar os recursos
+        try {
+            if (rs != null) rs.close();
+            if (pstm != null) pstm.close();
+            if (conn != null) conn.close();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao fechar conexão: " + e.getMessage());
+        }
+    }
+    return produtosVendidos;
+}
         
 }
 
