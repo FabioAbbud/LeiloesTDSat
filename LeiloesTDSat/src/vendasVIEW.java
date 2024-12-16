@@ -7,6 +7,10 @@
  *
  * @author Fabio
  */
+import javax.swing.table.DefaultTableModel;
+import javax.swing.JOptionPane;
+import java.util.ArrayList;
+
 public class vendasVIEW extends javax.swing.JFrame {
 
     /**
@@ -14,6 +18,7 @@ public class vendasVIEW extends javax.swing.JFrame {
      */
     public vendasVIEW() {
         initComponents();
+        listarProdutosVendidosNaTabela();
     }
 
     /**
@@ -112,7 +117,33 @@ public class vendasVIEW extends javax.swing.JFrame {
     private void btnVoltar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoltar1ActionPerformed
         this.dispose();
     }//GEN-LAST:event_btnVoltar1ActionPerformed
+ private void listarProdutosVendidosNaTabela() {
+        try {
+            // Instancia a classe ProdutosDAO
+            ProdutosDAO produtosDAO = new ProdutosDAO();
 
+            // Chama o método listarProdutosVendidos
+            ArrayList<ProdutosDTO> produtosVendidos = produtosDAO.listarProdutosVendidos();
+
+            // Modelo da tabela
+            DefaultTableModel model = (DefaultTableModel) listaProdutos.getModel();
+            model.setRowCount(0);  // Limpa a tabela antes de adicionar os novos produtos
+
+            // Adiciona os produtos vendidos na tabela
+            for (ProdutosDTO produto : produtosVendidos) {
+                model.addRow(new Object[]{
+                    produto.getId(),
+                    produto.getNome(),
+                    produto.getValor(),
+                    produto.getStatus()
+                });
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Erro ao listar produtos vendidos: " + e.getMessage());
+        }
+    }
+    
     /**
      * @param args the command line arguments
      */

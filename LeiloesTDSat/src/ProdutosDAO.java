@@ -138,7 +138,47 @@ ArrayList<ProdutosDTO> listagem = new ArrayList<>();
         }
     }
 }
-    
+    public ArrayList<ProdutosDTO> listarProdutosVendidos() {
+    ArrayList<ProdutosDTO> produtosVendidos = new ArrayList<>();
+    Connection conn = null;
+    PreparedStatement pstm = null;
+    ResultSet rs = null;
+
+    try {
+        // Estabelecendo a conexão com o banco de dados
+        conn = new conectaDAO().connectDB();
+
+        // SQL para buscar os produtos com status 'Vendido'
+        String sql = "SELECT * FROM produtos WHERE status = ?";
+        pstm = conn.prepareStatement(sql);
+        pstm.setString(1, "Vendido");
+
+        // Executar a consulta
+        rs = pstm.executeQuery();
+
+        // Preencher a lista com os produtos vendidos
+        while (rs.next()) {
+            ProdutosDTO produto = new ProdutosDTO();
+            produto.setId(rs.getInt("id"));
+            produto.setNome(rs.getString("nome"));
+            produto.setValor(rs.getInt("valor"));
+            produto.setStatus(rs.getString("status"));
+            produtosVendidos.add(produto);
+        }
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, "Erro ao listar produtos vendidos: " + e.getMessage());
+    } finally {
+        // Fechar os recursos
+        try {
+            if (rs != null) rs.close();
+            if (pstm != null) pstm.close();
+            if (conn != null) conn.close();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao fechar conexão: " + e.getMessage());
+        }
+    }
+    return produtosVendidos;
+}
         
 }
 
