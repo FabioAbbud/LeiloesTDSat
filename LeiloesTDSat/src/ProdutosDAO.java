@@ -103,7 +103,41 @@ ArrayList<ProdutosDTO> listagem = new ArrayList<>();
     return listagem;
     }
     
-    
+    public void venderProduto(int idProduto) {
+    Connection conn = null;
+    PreparedStatement pstm = null;
+
+    try {
+        // Conexão com o banco
+        conn = new conectaDAO().connectDB();
+
+        // Atualizando o status do produto para "Vendido"
+        String sql = "UPDATE produtos SET status = ? WHERE id = ?";
+        pstm = conn.prepareStatement(sql);
+        pstm.setString(1, "Vendido");
+        pstm.setInt(2, idProduto);
+
+        int rowsAffected = pstm.executeUpdate();
+
+        // Verifica se o produto foi atualizado
+        if (rowsAffected > 0) {
+            JOptionPane.showMessageDialog(null, "Produto vendido com sucesso!");
+        } else {
+            JOptionPane.showMessageDialog(null, "Produto não encontrado ou já vendido.");
+        }
+
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, "Erro ao vender produto: " + e.getMessage());
+    } finally {
+        // Fechando recursos
+        try {
+            if (pstm != null) pstm.close();
+            if (conn != null) conn.close();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao fechar conexão: " + e.getMessage());
+        }
+    }
+}
     
         
 }
